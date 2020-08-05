@@ -5,7 +5,7 @@ import vuetify from './plugins/vuetify';
 import axios from 'axios';
 
 // store의 index.js를 가져옵니다.
-import store from '@/store/index.js';
+import store from './store';
 
 Vue.config.productionTip = false;
 Vue.prototype.$http = axios;

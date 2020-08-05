@@ -56,7 +56,6 @@ export default {
 		// 스토어의 리스트 중에서 검색한 유저이름의 포스트 목록만 반환합니다.
 		computedList() {
 			let list = [];
-
 			for (let item of this.GE_POST_LIST) {
 				if (item.author == this.storeUserName) {
 					list.push(item);
