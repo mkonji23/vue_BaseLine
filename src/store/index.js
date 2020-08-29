@@ -1,12 +1,14 @@
 // 파일 위치: /root/src/store/index.js
 import Vue from 'vue';
 import Vuex from 'vuex';
-import modules from './modules';
 
 Vue.use(Vuex);
-
-const store = new Vuex.Store({
-	modules,
+/**
+ *  modules 폴더안에 있는 모든 모듈 가져오기
+ */
+import modules from './modules';
+export const store = new Vuex.Store({
+	modules: modules,
 });
 
 export default store;
