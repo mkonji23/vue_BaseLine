@@ -4,6 +4,7 @@ import Home from '../views/Home.vue';
 import Regist from '../views/Regist.vue';
 import Show from '../views/RegistShow.vue';
 import vuexTest from '../views/VuexTest.vue';
+import Setting from '../views/Setting.vue';
 
 Vue.use(VueRouter);
 
@@ -27,6 +28,12 @@ const routes = [
 		path: '/vuexTest',
 		name: 'vuexTest',
 		component: vuexTest,
+	},
+	// 메뉴 세팅
+	{
+		path: '/setting',
+		name: 'Setting',
+		component: Setting,
 	},
 	{
 		path: '/about',
