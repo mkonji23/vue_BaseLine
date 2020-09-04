@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex';
+
 export default {
 	data() {
 		return {
@@ -46,13 +48,22 @@ export default {
 	created() {
 		this.callApi();
 	},
+	computed: {
+		...mapState('registStore', ['dataList']),
+	},
 	methods: {
+		...mapActions('registStore', ['getRegistList']),
+		callStore() {
+			this.getRegistList('?');
+			console.log('this.dataList', this.dataList);
+		},
 		callApi() {
 			this.$http
 				.get('/api/regist/select')
 				.then(res => {
 					this.items = res.data;
 					console.log(res.data);
+					this.callStore();
 				})
 				.catch(err => {
 					console.log(err);
