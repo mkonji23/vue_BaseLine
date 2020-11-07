@@ -1,5 +1,6 @@
 import http from 'axios';
-const registStore = {
+
+const menuStore = {
 	namespaced: true,
 	state: {
 		dataList: [],
@@ -17,17 +18,7 @@ const registStore = {
 			http
 				.get('/api/regist/select')
 				.then(res => {
-					commit('MU_REGIST_LIST', res.data);
-				})
-				.catch(err => {
-					console.log(err);
-				});
-		},
-		setRegistList: ({ commit }, payload) => {
-			http
-				.post('/api/regist', payload)
-				.then(res => {
-					console.log(res);
+					commit('MU_REGIST_LIST', res);
 				})
 				.catch(err => {
 					console.log(err);
@@ -36,4 +27,4 @@ const registStore = {
 	},
 };
 
-export default registStore;
+export default menuStore;

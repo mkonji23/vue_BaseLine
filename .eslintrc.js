@@ -36,6 +36,7 @@ module.exports = {
             },
           ],
           'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-          'no-unused-vars': 'off'
+          'no-unused-vars': 'off',
+          'vue/no-unused-components': 'off' // 미사용 변수 체크 해제
         },
 };

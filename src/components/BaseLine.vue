@@ -34,6 +34,14 @@
 						<v-list-item-title>Vuex</v-list-item-title>
 					</v-list-item-content>
 				</v-list-item>
+				<v-list-item link @click="goPush('/setting')">
+					<v-list-item-action>
+						<v-icon>mdi-bowling</v-icon>
+					</v-list-item-action>
+					<v-list-item-content>
+						<v-list-item-title>setting</v-list-item-title>
+					</v-list-item-content>
+				</v-list-item>
 			</v-list>
 		</v-navigation-drawer>
 

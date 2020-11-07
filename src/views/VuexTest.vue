@@ -1,103 +1,282 @@
 <template>
-	<div id>
-		유저 이름: <input v-model="userName" type="text" />
-		<button @click="searchName">
-			검색
-		</button>
+	<v-data-table
+		:headers="headers"
+		:items="desserts"
+		sort-by="calories"
+		class="elevation-1"
+	>
+		<template v-slot:top>
+			<v-toolbar flat>
+				<v-toolbar-title>My CRUD</v-toolbar-title>
+				<v-divider class="mx-4" inset vertical></v-divider>
+				<v-spacer></v-spacer>
+				<v-dialog v-model="dialog" max-width="500px">
+					<template v-slot:activator="{ on, attrs }">
+						<v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
+							New Item
+						</v-btn>
+					</template>
+					<v-card>
+						<v-card-title>
+							<span class="headline">{{ formTitle }}</span>
+						</v-card-title>
 
-		<div v-for="(item, idx) in computedList" :key="idx">
-			제목: {{ item.title }} 저자: {{ item.author }}
-		</div>
-	</div>
+						<v-card-text>
+							<v-container>
+								<v-row>
+									<v-col cols="12" sm="6" md="4">
+										<v-text-field
+											v-model="editedItem.name"
+											label="Dessert name"
+										></v-text-field>
+									</v-col>
+									<v-col cols="12" sm="6" md="4">
+										<v-text-field
+											v-model="editedItem.calories"
+											label="Calories"
+										></v-text-field>
+									</v-col>
+									<v-col cols="12" sm="6" md="4">
+										<v-text-field
+											v-model="editedItem.fat"
+											label="Fat (g)"
+										></v-text-field>
+									</v-col>
+									<v-col cols="12" sm="6" md="4">
+										<v-text-field
+											v-model="editedItem.carbs"
+											label="Carbs (g)"
+										></v-text-field>
+									</v-col>
+									<v-col cols="12" sm="6" md="4">
+										<v-text-field
+											v-model="editedItem.protein"
+											label="Protein (g)"
+										></v-text-field>
+									</v-col>
+								</v-row>
+							</v-container>
+						</v-card-text>
+
+						<v-card-actions>
+							<v-spacer></v-spacer>
+							<v-btn color="blue darken-1" text @click="close">
+								Cancel
+							</v-btn>
+							<v-btn color="blue darken-1" text @click="save">
+								Save
+							</v-btn>
+						</v-card-actions>
+					</v-card>
+				</v-dialog>
+				<v-dialog v-model="dialogDelete" max-width="500px">
+					<v-card>
+						<v-card-title class="headline"
+							>Are you sure you want to delete this item?</v-card-title
+						>
+						<v-card-actions>
+							<v-spacer></v-spacer>
+							<v-btn color="blue darken-1" text @click="closeDelete"
+								>Cancel</v-btn
+							>
+							<v-btn color="blue darken-1" text @click="deleteItemConfirm"
+								>OK</v-btn
+							>
+							<v-spacer></v-spacer>
+						</v-card-actions>
+					</v-card>
+				</v-dialog>
+			</v-toolbar>
+		</template>
+		<template v-slot:item.actions="{ item }">
+			<v-icon small class="mr-2" @click="editItem(item)">
+				mdi-pencil
+			</v-icon>
+			<v-icon small @click="deleteItem(item)">
+				mdi-delete
+			</v-icon>
+		</template>
+		<template v-slot:no-data>
+			<v-btn color="primary" @click="initialize">
+				Reset
+			</v-btn>
+		</template>
+	</v-data-table>
 </template>
-
 <script>
-// vuex 라이브러리에서 mapActions, mapGetters 함수를 가져옵니다.
-import { mapActions, mapGetters } from 'vuex';
-
-/*
-  namespaced: true를 사용했기 때문에 선언해줍니다.
-  index.js 에서 modules 객체의 '키' 이름입니다.
-
-  modules: {
-    키: 값
-    userStore: userStore,
-    postStore: postStore
-  }  
-*/
-const userStore = 'userStore';
-const postStore = 'postStore';
-
 export default {
-	name: 'VuexTest',
-	data() {
-		return {
-			userName: '',
-		};
-	},
+	data: () => ({
+		dialog: false,
+		dialogDelete: false,
+		headers: [
+			{
+				text: 'Dessert (100g serving)',
+				align: 'start',
+				sortable: false,
+				value: 'name',
+			},
+			{ text: 'Calories', value: 'calories' },
+			{ text: 'Fat (g)', value: 'fat' },
+			{ text: 'Carbs (g)', value: 'carbs' },
+			{ text: 'Protein (g)', value: 'protein' },
+			{ text: 'Actions', value: 'actions', sortable: false },
+		],
+		desserts: [],
+		editedIndex: -1,
+		editedItem: {
+			name: '',
+			calories: 0,
+			fat: 0,
+			carbs: 0,
+			protein: 0,
+		},
+		defaultItem: {
+			name: '',
+			calories: 0,
+			fat: 0,
+			carbs: 0,
+			protein: 0,
+		},
+	}),
+
 	computed: {
-		/*
-      mapGetter는 store의 getters를 가져옵니다.
-
-      네임스페이스를 사용하기 때문에 키 이름을 적어줍니다. (userStore, postStore)
-
-      2가지 방식으로 가져올 수 있습니다.
-      1) 이름 지정해서 가져오기
-      2) getters 이름 그대로 사용해서 가져오기
-    */
-		// 1) 이름 지정해서 가져오기
-		...mapGetters(userStore, {
-			storeUserName: 'GE_USER_NAME',
-		}),
-
-		// 2) getters 이름 그대로 사용해서 가져오기
-		...mapGetters(postStore, ['GE_POST_LIST']),
-
-		// 스토어의 리스트 중에서 검색한 유저이름의 포스트 목록만 반환합니다.
-		computedList() {
-			let list = [];
-			for (let item of this.GE_POST_LIST) {
-				if (item.author == this.storeUserName) {
-					list.push(item);
-				}
-			}
-
-			return list;
+		formTitle() {
+			return this.editedIndex === -1 ? 'New Item' : 'Edit Item';
 		},
 	},
+
 	watch: {
-		// getters에 watch를 걸 수 있습니다.
-		storeUserName(val) {
-			this.userName = val;
+		dialog(val) {
+			val || this.close();
+		},
+		dialogDelete(val) {
+			val || this.closeDelete();
 		},
 	},
+
 	created() {
-		this.userName = this.storeUserName;
+		this.initialize();
 	},
+
 	methods: {
-		/*
-      mapGetter는 store의 getters를 가져옵니다.
+		initialize() {
+			this.desserts = [
+				{
+					name: 'Frozen Yogurt',
+					calories: 159,
+					fat: 6.0,
+					carbs: 24,
+					protein: 4.0,
+				},
+				{
+					name: 'Ice cream sandwich',
+					calories: 237,
+					fat: 9.0,
+					carbs: 37,
+					protein: 4.3,
+				},
+				{
+					name: 'Eclair',
+					calories: 262,
+					fat: 16.0,
+					carbs: 23,
+					protein: 6.0,
+				},
+				{
+					name: 'Cupcake',
+					calories: 305,
+					fat: 3.7,
+					carbs: 67,
+					protein: 4.3,
+				},
+				{
+					name: 'Gingerbread',
+					calories: 356,
+					fat: 16.0,
+					carbs: 49,
+					protein: 3.9,
+				},
+				{
+					name: 'Jelly bean',
+					calories: 375,
+					fat: 0.0,
+					carbs: 94,
+					protein: 0.0,
+				},
+				{
+					name: 'Lollipop',
+					calories: 392,
+					fat: 0.2,
+					carbs: 98,
+					protein: 0,
+				},
+				{
+					name: 'Honeycomb',
+					calories: 408,
+					fat: 3.2,
+					carbs: 87,
+					protein: 6.5,
+				},
+				{
+					name: 'Donut',
+					calories: 452,
+					fat: 25.0,
+					carbs: 51,
+					protein: 4.9,
+				},
+				{
+					name: 'KitKat',
+					calories: 518,
+					fat: 26.0,
+					carbs: 65,
+					protein: 7,
+				},
+			];
+		},
 
-      네임스페이스를 사용하기 때문에 키 이름을 적어줍니다. (userStore, postStore)
+		editItem(item) {
+			this.editedIndex = this.desserts.indexOf(item);
+			this.editedItem = Object.assign({}, item);
+			this.dialog = true;
+		},
 
-      2가지 방식으로 가져올 수 있습니다.
-      1) 이름 지정해서 가져오기
-      2) getters 이름 그대로 사용해서 가져오기      
+		deleteItem(item) {
+			this.editedIndex = this.desserts.indexOf(item);
+			this.editedItem = Object.assign({}, item);
+			this.dialogDelete = true;
+		},
 
-      개인의 취향이지만, getters 이름 그대로 사용하는 것을 추천드립니다.
+		deleteItemConfirm() {
+			this.desserts.splice(this.editedIndex, 1);
+			this.closeDelete();
+		},
 
-      다른 메소드 이름으로 매핑 예를 들면, setUserName: AC_USER_NAME 하면,
-      setUserName 함수가 나중에는 스토어 함수인지, 현재 파일의 함수인지 헷갈리는 경우가 있습니다.
-    */
-		...mapActions(userStore, ['AC_USER_NAME']),
-		// 버튼을 클릭하면 수행됩니다.
-		searchName() {
-			const payload = {
-				userName: this.userName,
-			};
-			// store의 userName을 변경합니다.
-			this.AC_USER_NAME(payload);
+		close() {
+			this.dialog = false;
+			this.$nextTick(() => {
+				this.editedItem = Object.assign({}, this.defaultItem);
+				this.editedIndex = -1;
+			});
+		},
+
+		closeDelete() {
+			this.dialogDelete = false;
+			this.$nextTick(() => {
+				this.editedItem = Object.assign({}, this.defaultItem);
+				this.editedIndex = -1;
+			});
+		},
+
+		save() {
+			if (this.editedIndex > -1) {
+				Object.assign(this.desserts[this.editedIndex], this.editedItem);
+			} else {
+				this.desserts.push(this.editedItem);
+			}
+			this.close();
 		},
 	},
 };
 </script>
+
+<style></style>
