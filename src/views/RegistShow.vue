@@ -2,9 +2,6 @@
 	<div>
 		<v-card>
 			<div>
-				<v-icon large @click="snackbar = false">
-					mdi-alpha-x-circle-outline
-				</v-icon>
 				<v-card-title>
 					<div>
 						사용자리스트
