@@ -120,6 +120,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex';
+const API_URL = 'http://localhost:8080/api';
 
 export default {
 	data() {
@@ -147,6 +148,7 @@ export default {
 	},
 	created() {
 		this.callSelect();
+		console.log(process.env);
 	},
 	computed: {
 		...mapState('registStore', ['dataList']),
@@ -160,7 +162,8 @@ export default {
 		// 조회
 		callSelect() {
 			this.$http
-				.get('/api/regist/select')
+				.get('/api/user/getList')
+				// .get('/user/userList/test')
 				.then(res => {
 					this.items = res.data;
 					this.callStore();
